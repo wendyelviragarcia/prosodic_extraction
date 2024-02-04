@@ -33,29 +33,36 @@ if praatVersion < 5363
 endif
 
 form extract F0 points
-sentence Folder /Users/weg/Desktop/n/
+sentence Folder /Users/weg/Desktop/test/
 comment Which tier do you want to use to extract the data?
 comment It must be a point tier
 integer tier 1
+comment Do you want all all the points of the same file in one line?
+integer wide_format 0
+
 comment Parameters for the analysis of F0
 integer f0_floor 75
 integer f0_ceiling 600
+
 endform
 
 ########################################
 #folder$ = chooseDirectory$ ("Choose a directory to read")
 #creates txt file
-writeFileLine: folder$+ "/"+ "f0_log.txt" , "Filename", tab$, "PointLabel", tab$, "time of Point", tab$, "fo"
+writeFileLine: folder$+ "/"+ "f0_log.txt" , "filename", tab$, "point_label", tab$, "time_of_point", tab$, "f0"
 
 Create Strings as file list: "list", folder$+ "/" +"*.wav"
 numberOfFiles = Get number of strings
-
+writeInfoLine: "We have started!"
 #empieza el bucle
 for ifile to numberOfFiles
 	######################	ACCIONES PARA TODOS LOS archivos	#############################
 	select Strings list
 	fileName$ = Get string: ifile
-	appendFile: folder$+ "/"+ "f0_log.txt" , fileName$, tab$
+	
+	if wide_format = 1
+		appendFile: folder$+ "/"+ "f0_log.txt" , fileName$, tab$
+	endif
 	base$ = fileName$ - ".wav"
 
 	# Lee el Sonido
@@ -71,6 +78,14 @@ for ifile to numberOfFiles
 
 	selectObject: myText
 	numberOfPoints= Get number of points: tier
+  	if numberOfPoints = 0
+  		appendInfoLine: "No points in: " + base$
+  		else
+  		numberOfPoints$=fixed$(numberOfPoints,0)
+  		 appendInfoLine: numberOfPoints$ + " points in: " + base$
+
+  	endif
+
 
 	# for each point in the textgrid, get the time of the point and the F0 and that point, then writes it down in txt file
 	for point to numberOfPoints
@@ -85,11 +100,24 @@ for ifile to numberOfFiles
 		f0_value$ = fixed$ (f0_value, 0)
 		
 		#lo escribe 
-		appendFile: folder$+ "/"+ "f0_log.txt" , labelOfPoint$, tab$, timeOfPoint, tab$, f0_value$, tab$
+
+		if wide_format = 1
+			appendFile: folder$+ "/"+ "f0_log.txt" , labelOfPoint$, tab$, timeOfPoint, tab$, f0_value$, tab$
+		else
+			appendFileLine: folder$+ "/"+ "f0_log.txt" , fileName$, tab$, labelOfPoint$, tab$, timeOfPoint, tab$, f0_value$, tab$
+		endif
+
+
+
 	endfor
 
+	if wide_format = 1
+		appendFileLine: folder$+ "/"+ "f0_log.txt" , tab$
+	endif
 
-	appendFileLine: folder$+ "/"+ "f0_log.txt" , tab$
 
 	removeObject: mySound, myText, myPitchTier
+
+	appendInfoLine: "The end!"
+
 endfor
