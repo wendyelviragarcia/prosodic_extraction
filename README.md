@@ -9,4 +9,3 @@ It includes:
 
 3. prosodic_data_extraction.praat: This script finds duration, intensity and 3 F0 (Hz and st) values for each non-empty interval it finds in the tier. It can also extract the corresponding labels for each interval. Then it saves the values in a tab-separated txt, which you can easily open with Excel.
 
-4. ongoing. Extracts entire F0 track for all files in a folder. It will extract the same number of points always, for example 30 points by word. checkds duration in order to do it.(Use it to build GAMM models in R). wide format all file. Long format a line by interval.
